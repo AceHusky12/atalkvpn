@@ -1,0 +1,78 @@
+.\" Copyright (c) 2021 Nathanial Sloss <nathanialsloss@yahoo.com.au>
+.\" All rights reserved.
+.\"
+.\" Redistribution and use in source and binary forms, with or without
+.\" modification, are permitted provided that the following conditions
+.\" are met:
+.\" 1. Redistributions of source code must retain the above copyright
+.\"    notice, this list of conditions and the following disclaimer.
+.\" 2. Redistributions in binary form must reproduce the above copyright
+.\"    notice, this list of conditions and the following disclaimer in the
+.\"    documentation and/or other materials provided with the distribution.
+.\"
+.\" THIS SOFTWARE IS PROVIDED BY THE NETBSD FOUNDATION, INC. AND CONTRIBUTORS
+.\" ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
+.\" TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+.\" PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE FOUNDATION OR CONTRIBUTORS
+.\" BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+.\" CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+.\" SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+.\" INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+.\" CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+.\" ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+.\" POSSIBILITY OF SUCH DAMAGE.
+.\"
+.Dd April 7, 2021
+.Dt ATALKVPN 1
+.Os
+.Sh NAME
+.Nm atalkvpn
+.Nd AppleTalk phase 1 tunneling sever for use with avpn-0.4.9.1.
+.Sh SYNOPSIS
+.Nm
+.Ar tapdev
+.Ar port
+.Sh DESCRIPTION
+The
+.Nm
+daemon is an AppleTalk (LocalTalk) tunneling program for use with avpn-0.4.9.1
+appletalk control panel from B.Braun. See: 
+
+.Pa https://web.archive.org/web/20160115003115if_/http://www.synack.net/~bbraun/macsrc/avpn0.4.9.1.cpt.hqx
+
+.Bl -tag -width indent
+.It Ar tapdev
+tap(4) device.
+.It Ar port
+UDP port number.
+This needs to be 1029 to connect to the corresponding MacOS control panel.
+.El
+.Pp
+You can use this control panel on your Macintosh Computer running at least
+AppleTalk version 58 or above with System 6 or 7.
+The STR "severname" resource with the control panel from B.Braun needs to be modified with
+the address of the server running this daemon.
+
+This will make it possible to print and run a file share over
+.Xr ppp 4 .
+
+This is for use with the
+.Pa netatalk22
+package from pkgsrc.
+The
+.Xr tap 4 device must be set up as a phase 1 address and apfpd.conf should have
+the option
+.Sq -tickleval -1
+added to afpd.conf to disable session tickles which
+if left in the defaults will cause the print/file share to disconnect.
+.Pp
+Password authentication is not used from the control panel at present.
+
+.Sh SEE ALSO
+.Xr pppd 8
+.Xr papd 8
+.Xr afpd 8
+.Xr papd.conf 5
+.Xr afpd.conf 5
+.Sh AUTHORS
+Nathanial Sloss

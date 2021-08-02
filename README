@@ -1,0 +1,11 @@
+NAME
+     atalkvpn - AppleTalk phase 1 tunneling sever for use with avpn-0.4.9.1.
+
+SYNOPSIS
+     atalkvpn tapdev port
+
+DESCRIPTION
+     The atalkvpn daemon is an AppleTalk (LocalTalk) tunneling program for use
+     with avpn-0.4.9.1 appletalk control panel from B.Braun. See:
+
+     https://web.archive.org/web/20160115003115if_/http://www.synack.net/~bbraun/macsrc/avpn0.4.9.1.cpt.hqx
