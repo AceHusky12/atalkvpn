@@ -1,12 +1,12 @@
 #!/bin/sh
 #
-# PROVIDE: atalktun
+# PROVIDE: atalkvpnd
 # REQUIRE: atalkd
 #
 
 $_rc_subr_loaded . /etc/rc.subr
 
-name="atalktun"
+name="atalkvpnd"
 rcvar=$name
 command="/usr/pkg/bin/atalkvpn"
 pidfile="/var/run/${name}.pid"

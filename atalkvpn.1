@@ -30,8 +30,9 @@
 .Nd AppleTalk phase 1 tunneling sever for use with avpn-0.4.9.1.
 .Sh SYNOPSIS
 .Nm
-.Ar tapdev
-.Ar port
+.Op Fl n
+.Op Fl p Ar port
+.Fl i Ar tadev
 .Sh DESCRIPTION
 The
 .Nm
@@ -41,11 +42,13 @@ appletalk control panel from B.Braun. See:
 .Pa https://web.archive.org/web/20160115003115if_/http://www.synack.net/~bbraun/macsrc/avpn0.4.9.1.cpt.hqx
 
 .Bl -tag -width indent
-.It Ar tapdev
+.It Fl i Ar tapdev
 tap(4) device.
-.It Ar port
+.It Fl p Ar port
 UDP port number.
 This needs to be 1029 to connect to the corresponding MacOS control panel.
+.It Fl n
+Disable timeouts when not sending/receiving data.
 .El
 .Pp
 You can use this control panel on your Macintosh Computer running at least
@@ -68,11 +71,22 @@ if left in the defaults will cause the print/file share to disconnect.
 .Pp
 Password authentication is not used from the control panel at present.
 
+.Sh EXAMPLES
+Add the following to
+.Xr rc.conf 5
+with the correct configured
+.Xr tap 4
+device:
+.Dl atalkvpnd=YES
+.Dl atalkvpnd_flags="-n -i /dev/tap0" 
+
 .Sh SEE ALSO
+.Xr tap 4
 .Xr pppd 8
 .Xr papd 8
 .Xr afpd 8
 .Xr papd.conf 5
 .Xr afpd.conf 5
+.Xr rc.conf 5
 .Sh AUTHORS
 Nathanial Sloss

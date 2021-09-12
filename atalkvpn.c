@@ -173,35 +173,58 @@ main (int argc, char* argv[])
 	int authme = 0, commsock, new_conn, connlen, mydata, nr, tapdev;
 	unsigned char magic[12]= { 0, 5, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 };
 	struct timeval lasttime, timenow;
-	int skip = 0;
+	int ch, notimeout = 0, skip = 0;
+	char mytap[255], myport[255] = "1029";
 
-	if (argc != 3)
+	while ((ch = getopt(argc, argv, "i:p:n")) !=
+	    EOF) {
+		switch (ch) {
+		case 'p':
+			strncpy(myport, optarg, sizeof(myport));
+			break;
+		case 'i':
+			strncpy(mytap, optarg, sizeof(mytap));
+			break;
+		case 'n':
+			notimeout = 1;
+			break;
+		default:
+			usage();
+		}
+	}
+	argv += optind;
+	argc -= optind;
+
+	if (argc)
 		usage();
+	if (!strlen(mytap))
+		usage();
+
 
 	buff = malloc(BUFF_SZ);
 	if (buff == NULL) {
-		errx(errno, "cannot allocate buffer\n");
+		err(errno, "cannot allocate buffer\n");
 	}
 
 	outbuff = malloc(BUFF_SZ+2);
 	if (outbuff == NULL) {
 		free(buff);
-		errx(errno, "cannot allocate output buffer\n");
+		err(errno, "cannot allocate output buffer\n");
 	}
 #ifndef DEBUG
-	if (daemon(0, 0) == -1) {
+	if (daemon(0, 1) == -1) {
 		free(outbuff);
 		free(buff);
-		err(EXIT_FAILURE, "daemon");
+		errx(EXIT_FAILURE, "daemon");
 	}
 	pidfile("/var/run/atalktun.pid");
 #endif
 
 	for (;;) {
-	if ((tapdev = open(argv[1], O_RDWR|O_NONBLOCK)) < 0) {
+	if ((tapdev = open(mytap, O_RDWR|O_NONBLOCK)) < 0) {
 		free(outbuff);
 		free(buff);
-		errx(errno, "cannot open tap device %s", argv[1]);
+		errx(errno, "cannot open tap device %s", mytap);
 	}
 
 	memset(&hints, 0, sizeof(struct addrinfo));
@@ -209,7 +232,7 @@ main (int argc, char* argv[])
 	hints.ai_socktype = SOCK_DGRAM;
 	hints.ai_protocol = IPPROTO_UDP;
 
-	commsock = local_listen(NULL, argv[2], hints);
+	commsock = local_listen(NULL, myport, hints);
 	struct sockaddr_storage z;
 
         int len = sizeof(z);
@@ -218,18 +241,18 @@ main (int argc, char* argv[])
             (struct sockaddr *)&z, &len)) < 0 && errno == EAGAIN)
 		usleep(100000);
         if (nr < 0)
-              err(1, "recvfrom");
+              errx(1, "recvfrom");
 
         nr = connect(commsock, (struct sockaddr *)&z, len);
        if (nr < 0)
-       		err(1, "connect");
+       		errx(1, "connect");
 	gettimeofday(&lasttime, NULL);
 	timenow = lasttime;
 
 	while (1) {
 
 		gettimeofday(&timenow, NULL);
-		if (timenow.tv_sec > lasttime.tv_sec + 240)
+		if (!notimeout && (timenow.tv_sec > lasttime.tv_sec + 240))
 			goto next;
 
 		while (ioctl(commsock, FIONREAD, &mydata) == -1) {
@@ -261,6 +284,7 @@ main (int argc, char* argv[])
 				lasttime = timenow;
 				break;
 			case 1:
+				lasttime = timenow;
 				buff[3] = 36;
 				write(commsock, buff, 3);
 				break;
@@ -395,7 +419,7 @@ local_listen(char *host, char *port, struct addrinfo hints)
 
 		ret = setsockopt(s, SOL_SOCKET, SO_REUSEPORT, &x, sizeof(x));
 		if (ret == -1)
-			err(1, NULL);
+			errx(1, NULL);
 
 
 		if (bind(s, (struct sockaddr *)res->ai_addr,
@@ -416,6 +440,6 @@ local_listen(char *host, char *port, struct addrinfo hints)
 void
 usage()
 {
-	errx(EXIT_FAILURE, "usage: %s port tapdev", getprogname());
+	errx(EXIT_FAILURE, "usage: %s [-n] [-p port] -i tapdev", getprogname());
 }
 
