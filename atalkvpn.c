@@ -217,7 +217,7 @@ main (int argc, char* argv[])
 		free(buff);
 		errx(EXIT_FAILURE, "daemon");
 	}
-	pidfile("/var/run/atalktun.pid");
+	pidfile("/var/run/atalkvpnd.pid");
 #endif
 
 	for (;;) {
